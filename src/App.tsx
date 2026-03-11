@@ -225,236 +225,205 @@ export default function App() {
     }
   }, [volume]);
 
+  const [isCompact, setIsCompact] = useState(false);
+  const [activeTab, setActiveTab] = useState<'tool' | 'guide'>('tool');
+
   return (
-    <div className={`min-h-screen ${THEME.bg} ${THEME.textPrimary} flex flex-col items-center justify-center p-4 selection:bg-[#00FF00] selection:text-black`}>
+    <div className={`min-h-screen ${THEME.bg} ${THEME.textPrimary} flex flex-col items-center justify-center p-4 selection:bg-[#00FF00] selection:text-black transition-all duration-500`}>
       
-      {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-12 text-center"
-      >
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <div className={`p-2 rounded-lg ${THEME.accentBg} bg-opacity-10`}>
-            <Headphones className={`w-8 h-8 ${THEME.accent}`} />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tighter uppercase italic">AudioSwap Fixer</h1>
-        </div>
-        <p className={`${THEME.textSecondary} text-sm max-w-xs mx-auto`}>
-          Real-time stereo channel correction for reversed headsets.
-        </p>
-      </motion.div>
-
-      {/* Main Control Panel */}
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className={`w-full max-w-md ${THEME.card} rounded-2xl border ${THEME.border} shadow-2xl overflow-hidden`}
-      >
-        {/* Status Bar */}
-        <div className={`px-6 py-3 border-b ${THEME.border} flex items-center justify-between`}>
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${status === 'active' ? 'bg-[#00FF00] animate-pulse' : 'bg-[#8E9299]'}`} />
-            <span className={`${THEME.mono} text-[10px] uppercase tracking-widest ${THEME.textSecondary}`}>
-              System Status: {status.toUpperCase()}
-            </span>
-          </div>
-          {status === 'error' && (
-            <div className="flex items-center gap-1 text-red-500 text-[10px] uppercase font-bold">
-              <AlertCircle className="w-3 h-3" />
-              Error Detected
+      {/* Header - Hide in compact mode */}
+      {!isCompact && (
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 text-center"
+        >
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className={`p-2 rounded-lg ${THEME.accentBg} bg-opacity-10`}>
+              <Headphones className={`w-8 h-8 ${THEME.accent}`} />
             </div>
-          )}
-        </div>
-
-        <div className="p-8 space-y-8">
-          
-          {/* Swap Toggle Section */}
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <div className="relative">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={toggleSwap}
-                className={`w-32 h-32 rounded-full border-4 flex flex-col items-center justify-center transition-all duration-500 ${
-                  isSwapped 
-                    ? `${THEME.accentBg} border-[#00FF00] shadow-[0_0_30px_rgba(0,255,0,0.2)]` 
-                    : `bg-transparent ${THEME.border} border-dashed`
-                }`}
-              >
-                <RefreshCw className={`w-10 h-10 mb-2 transition-transform duration-700 ${isSwapped ? 'rotate-180 text-black' : THEME.textSecondary}`} />
-                <span className={`text-[10px] font-bold uppercase tracking-tighter ${isSwapped ? 'text-black' : THEME.textSecondary}`}>
-                  {isSwapped ? 'Swapped' : 'Normal'}
-                </span>
-              </motion.button>
-              
-              {/* Visual indicators for L/R */}
-              <div className="absolute -left-12 top-1/2 -translate-y-1/2 flex flex-col items-center">
-                <span className={`${THEME.mono} text-xs font-bold ${isSwapped ? 'text-[#00FF00]' : THEME.textSecondary}`}>L</span>
-                <ChevronRight className={`w-4 h-4 ${isSwapped ? 'text-[#00FF00] rotate-180' : THEME.textSecondary}`} />
-              </div>
-              <div className="absolute -right-12 top-1/2 -translate-y-1/2 flex flex-col items-center">
-                <span className={`${THEME.mono} text-xs font-bold ${isSwapped ? 'text-[#00FF00]' : THEME.textSecondary}`}>R</span>
-                <ChevronRight className={`w-4 h-4 ${isSwapped ? 'text-[#00FF00] rotate-180' : 'text-[#8E9299] rotate-180'}`} />
-              </div>
-            </div>
-            
-            <p className={`text-center text-xs ${THEME.textSecondary} italic`}>
-              {isSwapped 
-                ? "Left channel is now routed to Right ear, and vice versa." 
-                : "Audio channels are in their default configuration."}
-            </p>
+            <h1 className="text-3xl font-bold tracking-tighter uppercase italic">AudioSwap Fixer</h1>
           </div>
+          <p className={`${THEME.textSecondary} text-sm max-w-xs mx-auto`}>
+            Professional utility for correcting reversed stereo channels.
+          </p>
+        </motion.div>
+      )}
 
-          <div className={`h-px ${THEME.border} w-full`} />
-
-          {/* Monitoring Controls */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label className={`${THEME.mono} text-[10px] uppercase tracking-widest ${THEME.textSecondary}`}>
-                Real-Time Monitoring
-              </label>
-              <div className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${isMonitoring ? 'bg-[#00FF00] text-black' : 'bg-[#2A2B2F] text-[#8E9299]'}`}>
-                {isMonitoring ? 'Live' : 'Off'}
-              </div>
-            </div>
-            
-            <button
-              onClick={isMonitoring ? stopMonitoring : startMonitoring}
-              className={`w-full py-4 rounded-xl flex items-center justify-center gap-3 font-bold uppercase tracking-widest text-xs transition-all ${
-                isMonitoring 
-                  ? 'bg-red-500/10 border border-red-500/50 text-red-500 hover:bg-red-500/20' 
-                  : `${THEME.accentBg} text-black hover:opacity-90`
-              }`}
-            >
-              {isMonitoring ? (
-                <>
-                  <MicOff className="w-4 h-4" />
-                  Stop Monitoring
-                </>
-              ) : (
-                <>
-                  <Mic className="w-4 h-4" />
-                  Start Mic Monitor
-                </>
-              )}
-            </button>
-            <p className={`text-[10px] ${THEME.textSecondary} text-center italic`}>
-              Use this to hear your microphone with the current swap settings.
-            </p>
-          </div>
-
-          <div className={`h-px ${THEME.border} w-full`} />
-
-          {/* File Player Section */}
-          <div className="space-y-4">
-            <label className={`${THEME.mono} text-[10px] uppercase tracking-widest ${THEME.textSecondary}`}>
-              Media File Test
-            </label>
-            <div className="flex flex-col gap-3">
-              <input 
-                type="file" 
-                accept="audio/*" 
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    cleanupSource();
-                    const ctx = await initAudio();
-                    const audio = new Audio(URL.createObjectURL(file));
-                    const source = ctx.createMediaElementSource(audio);
-                    sourceNodeRef.current = source;
-                    setupRouting(ctx, source);
-                    audio.play();
-                    setStatus('active');
-                  }
-                }}
-                className="hidden" 
-                id="audio-upload"
-              />
-              <label 
-                htmlFor="audio-upload"
-                className={`py-3 rounded-lg border ${THEME.border} border-dashed hover:border-[#00FF00] hover:bg-white/5 flex items-center justify-center gap-2 transition-all cursor-pointer`}
-              >
-                <Play className="w-4 h-4 text-[#00FF00]" />
-                <span className="text-xs font-bold uppercase tracking-widest">Upload & Play File</span>
-              </label>
-            </div>
-          </div>
-
-          <div className={`h-px ${THEME.border} w-full`} />
-          <div className="space-y-4">
-            <label className={`${THEME.mono} text-[10px] uppercase tracking-widest ${THEME.textSecondary}`}>
-              Channel Verification
-            </label>
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => playTestSound('left')}
-                className={`py-3 rounded-lg border ${THEME.border} hover:bg-white/5 flex items-center justify-center gap-2 transition-colors`}
-              >
-                <Volume2 className="w-4 h-4 text-[#00FF00]" />
-                <span className="text-xs font-bold uppercase tracking-widest">Test Left</span>
-              </button>
-              <button
-                onClick={() => playTestSound('right')}
-                className={`py-3 rounded-lg border ${THEME.border} hover:bg-white/5 flex items-center justify-center gap-2 transition-colors`}
-              >
-                <Volume2 className="w-4 h-4 text-[#00FF00]" />
-                <span className="text-xs font-bold uppercase tracking-widest">Test Right</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Volume Slider */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <label className={`${THEME.mono} text-[10px] uppercase tracking-widest ${THEME.textSecondary}`}>
-                Output Volume
-              </label>
-              <span className={`${THEME.mono} text-xs text-[#00FF00]`}>{volume}%</span>
-            </div>
-            <input 
-              type="range" 
-              min="0" 
-              max="100" 
-              value={volume}
-              onChange={(e) => setVolume(parseInt(e.target.value))}
-              className="w-full h-1 bg-[#2A2B2F] rounded-lg appearance-none cursor-pointer accent-[#00FF00]"
-            />
-          </div>
-        </div>
-
-        {/* Footer / Device Info */}
-        <div className={`bg-black/20 p-4 border-t ${THEME.border}`}>
-          <div className="flex items-center gap-2 text-[#8E9299]">
-            <Monitor className="w-3 h-3" />
-            <span className={`${THEME.mono} text-[9px] uppercase tracking-tight`}>
-              Detected Output: {devices.length > 0 ? devices[0].label : 'System Default'}
-            </span>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Error Toast */}
-      <AnimatePresence>
-        {status === 'error' && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-3"
+      {/* Tab Switcher - Hide in compact mode */}
+      {!isCompact && (
+        <div className="flex bg-[#1C1D21] p-1 rounded-xl border border-[#2A2B2F] mb-6">
+          <button 
+            onClick={() => setActiveTab('tool')}
+            className={`px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'tool' ? 'bg-[#00FF00] text-black' : 'text-[#8E9299] hover:text-white'}`}
           >
-            <AlertCircle className="w-5 h-5" />
-            <span className="text-sm font-medium">{errorMessage}</span>
-            <button onClick={() => setStatus('idle')} className="ml-2 hover:opacity-70">
-              <CheckCircle2 className="w-4 h-4" />
-            </button>
+            Web Tester
+          </button>
+          <button 
+            onClick={() => setActiveTab('guide')}
+            className={`px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'guide' ? 'bg-[#00FF00] text-black' : 'text-[#8E9299] hover:text-white'}`}
+          >
+            System Fix Guide
+          </button>
+        </div>
+      )}
+
+      {/* Main Content Area */}
+      <AnimatePresence mode="wait">
+        {activeTab === 'tool' ? (
+          <motion.div 
+            key="tool"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className={`w-full ${isCompact ? 'max-w-[240px]' : 'max-w-md'} ${THEME.card} rounded-2xl border ${THEME.border} shadow-2xl overflow-hidden transition-all duration-500`}
+          >
+            {/* Status Bar */}
+            <div className={`px-4 py-2 border-b ${THEME.border} flex items-center justify-between bg-black/20`}>
+              <div className="flex items-center gap-2">
+                <div className={`w-1.5 h-1.5 rounded-full ${status === 'active' ? 'bg-[#00FF00] animate-pulse' : 'bg-[#8E9299]'}`} />
+                <span className={`${THEME.mono} text-[8px] uppercase tracking-widest ${THEME.textSecondary}`}>
+                  {isCompact ? 'COMPACT' : 'WEB SANDBOX MODE'}
+                </span>
+              </div>
+              <button 
+                onClick={() => setIsCompact(!isCompact)}
+                className={`p-1 rounded hover:bg-white/10 transition-colors ${THEME.textSecondary}`}
+                title={isCompact ? "Expand" : "Compact Mode"}
+              >
+                <Settings className="w-3 h-3" />
+              </button>
+            </div>
+
+            <div className={`${isCompact ? 'p-4' : 'p-8'} space-y-6`}>
+              {/* Swap Toggle Section */}
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <div className="relative">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={toggleSwap}
+                    className={`${isCompact ? 'w-20 h-20' : 'w-32 h-32'} rounded-full border-4 flex flex-col items-center justify-center transition-all duration-500 ${
+                      isSwapped 
+                        ? `${THEME.accentBg} border-[#00FF00] shadow-[0_0_30px_rgba(0,255,0,0.2)]` 
+                        : `bg-transparent ${THEME.border} border-dashed`
+                    }`}
+                  >
+                    <RefreshCw className={`${isCompact ? 'w-6 h-6' : 'w-10 h-10'} mb-1 transition-transform duration-700 ${isSwapped ? 'rotate-180 text-black' : THEME.textSecondary}`} />
+                    <span className={`${isCompact ? 'text-[8px]' : 'text-[10px]'} font-bold uppercase tracking-tighter ${isSwapped ? 'text-black' : THEME.textSecondary}`}>
+                      {isSwapped ? 'Swapped' : 'Normal'}
+                    </span>
+                  </motion.button>
+                  
+                  {!isCompact && (
+                    <>
+                      <div className="absolute -left-12 top-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <span className={`${THEME.mono} text-xs font-bold ${isSwapped ? 'text-[#00FF00]' : THEME.textSecondary}`}>L</span>
+                        <ChevronRight className={`w-4 h-4 ${isSwapped ? 'text-[#00FF00] rotate-180' : THEME.textSecondary}`} />
+                      </div>
+                      <div className="absolute -right-12 top-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <span className={`${THEME.mono} text-xs font-bold ${isSwapped ? 'text-[#00FF00]' : THEME.textSecondary}`}>R</span>
+                        <ChevronRight className={`w-4 h-4 ${isSwapped ? 'text-[#00FF00] rotate-180' : 'text-[#8E9299] rotate-180'}`} />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {!isCompact && <div className={`h-px ${THEME.border} w-full`} />}
+
+              {/* Monitoring Controls */}
+              <div className="space-y-2">
+                <button
+                  onClick={isMonitoring ? stopMonitoring : startMonitoring}
+                  className={`w-full ${isCompact ? 'py-2' : 'py-4'} rounded-xl flex items-center justify-center gap-2 font-bold uppercase tracking-widest text-[10px] transition-all ${
+                    isMonitoring 
+                      ? 'bg-red-500/10 border border-red-500/50 text-red-500 hover:bg-red-500/20' 
+                      : `${THEME.accentBg} text-black hover:opacity-90`
+                  }`}
+                >
+                  {isMonitoring ? <MicOff className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
+                  {isMonitoring ? 'Stop' : 'Start Mic'}
+                </button>
+              </div>
+
+              {/* Test Sounds */}
+              {!isCompact && (
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={() => playTestSound('left')}
+                    className={`py-3 rounded-lg border ${THEME.border} hover:bg-white/5 flex items-center justify-center gap-2 transition-colors`}
+                  >
+                    <Volume2 className="w-4 h-4 text-[#00FF00]" />
+                    <span className="text-xs font-bold uppercase tracking-widest">Test L</span>
+                  </button>
+                  <button
+                    onClick={() => playTestSound('right')}
+                    className={`py-3 rounded-lg border ${THEME.border} hover:bg-white/5 flex items-center justify-center gap-2 transition-colors`}
+                  >
+                    <Volume2 className="w-4 h-4 text-[#00FF00]" />
+                    <span className="text-xs font-bold uppercase tracking-widest">Test R</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="guide"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className={`w-full max-w-md ${THEME.card} rounded-2xl border ${THEME.border} shadow-2xl p-8 space-y-6`}
+          >
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold italic uppercase tracking-tight">System-Wide Fix</h2>
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                <p className="text-amber-500 text-[10px] font-bold uppercase leading-tight">
+                  Note: Web Apps cannot float on top of other apps or change system audio. You must use a native tool below for a permanent fix.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {/* Windows */}
+              <div className={`p-4 rounded-xl border ${THEME.border} bg-black/20`}>
+                <h3 className="text-sm font-bold text-[#00FF00] mb-2 flex items-center gap-2">
+                  <Monitor className="w-4 h-4" /> Windows (Permanent Fix)
+                </h3>
+                <p className="text-[11px] text-[#8E9299] mb-3">
+                  Use <strong>Equalizer APO</strong> with the <strong>Peace GUI</strong>. This runs in the background and swaps audio for every app (Games, Spotify, etc).
+                </p>
+                <div className="bg-black/40 p-2 rounded font-mono text-[9px] text-white/70">
+                  Command: Copy L=R R=L
+                </div>
+              </div>
+
+              {/* macOS */}
+              <div className={`p-4 rounded-xl border ${THEME.border} bg-black/20`}>
+                <h3 className="text-sm font-bold text-[#00FF00] mb-2 flex items-center gap-2">
+                  <Headphones className="w-4 h-4" /> macOS (Menu Bar Toggle)
+                </h3>
+                <p className="text-[11px] text-[#8E9299]">
+                  Install <strong>SoundSource</strong>. It adds a floating toggle to your menu bar that works system-wide.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-[#2A2B2F]">
+              <p className="text-[10px] text-center text-[#8E9299] italic">
+                Use the <strong>Web Tester</strong> to verify your system settings after installing these tools.
+              </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <footer className="mt-12 text-[10px] uppercase tracking-[0.2em] text-[#8E9299] opacity-50">
-        Professional Audio Utility &bull; v1.0.0
-      </footer>
+      {!isCompact && (
+        <footer className="mt-12 text-[10px] uppercase tracking-[0.2em] text-[#8E9299] opacity-50">
+          Professional Audio Utility &bull; v1.0.0
+        </footer>
+      )}
     </div>
   );
 }
