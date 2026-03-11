@@ -228,6 +228,27 @@ export default function App() {
   const [isCompact, setIsCompact] = useState(false);
   const [activeTab, setActiveTab] = useState<'tool' | 'guide'>('tool');
 
+  const [mediaUrl, setMediaUrl] = useState('');
+
+  const handleUrlPlay = async () => {
+    if (!mediaUrl) return;
+    try {
+      cleanupSource();
+      const ctx = await initAudio();
+      const audio = new Audio(mediaUrl);
+      audio.crossOrigin = "anonymous";
+      const source = ctx.createMediaElementSource(audio);
+      sourceNodeRef.current = source;
+      setupRouting(ctx, source);
+      audio.play();
+      setStatus('active');
+    } catch (err) {
+      console.error('URL Play failed:', err);
+      setStatus('error');
+      setErrorMessage('Could not load media. Ensure the URL is a direct link to an audio/video file.');
+    }
+  };
+
   return (
     <div className={`min-h-screen ${THEME.bg} ${THEME.textPrimary} flex flex-col items-center justify-center p-4 selection:bg-[#00FF00] selection:text-black transition-all duration-500`}>
       
@@ -347,6 +368,30 @@ export default function App() {
                 </button>
               </div>
 
+              {/* URL Player */}
+              {!isCompact && (
+                <div className="space-y-3">
+                  <label className={`${THEME.mono} text-[10px] uppercase tracking-widest ${THEME.textSecondary}`}>
+                    Stream from URL
+                  </label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text"
+                      value={mediaUrl}
+                      onChange={(e) => setMediaUrl(e.target.value)}
+                      placeholder="https://example.com/music.mp3"
+                      className={`flex-1 bg-black/40 border ${THEME.border} rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#00FF00] transition-colors`}
+                    />
+                    <button 
+                      onClick={handleUrlPlay}
+                      className={`p-2 rounded-lg ${THEME.accentBg} text-black hover:opacity-90 transition-opacity`}
+                    >
+                      <Play className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Test Sounds */}
               {!isCompact && (
                 <div className="grid grid-cols-2 gap-4">
@@ -397,6 +442,22 @@ export default function App() {
                 <div className="bg-black/40 p-2 rounded font-mono text-[9px] text-white/70">
                   Command: Copy L=R R=L
                 </div>
+              </div>
+
+              {/* Android */}
+              <div className={`p-4 rounded-xl border ${THEME.border} bg-black/20`}>
+                <h3 className="text-sm font-bold text-[#00FF00] mb-2 flex items-center gap-2">
+                  <Monitor className="w-4 h-4" /> Android (System Settings)
+                </h3>
+                <p className="text-[11px] text-[#8E9299] mb-3">
+                  Android doesn't have a native "Swap" toggle, but you can adjust balance:
+                </p>
+                <ol className="text-[11px] space-y-2 text-[#8E9299] list-decimal list-inside">
+                  <li>Go to <strong>Settings &rarr; Accessibility</strong>.</li>
+                  <li>Tap <strong>Hearing enhancements</strong> (or Audio).</li>
+                  <li>Adjust <strong>Left/right sound balance</strong>.</li>
+                  <li>Search Play Store for <strong>"Lesser AudioSwitch"</strong> for advanced routing.</li>
+                </ol>
               </div>
 
               {/* macOS */}
