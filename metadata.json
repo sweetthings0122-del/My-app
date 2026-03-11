@@ -1,0 +1,5 @@
+{
+  "name": "AudioSwap Fixer",
+  "description": "A real-time audio channel swapper for testing and fixing reversed stereo audio on headsets.",
+  "requestFramePermissions": ["microphone"]
+}
